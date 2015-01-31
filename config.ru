@@ -80,12 +80,6 @@ before do
   redirect to('/auth/auth0') unless current_user
 end
 
-get '/update_hook/simple' do
-  with_lock("/tmp/update_hook") do
-    "<pre>" + git_update_content + "</pre>"
-  end
-end
-
 get '/auth/auth0/callback' do
   session[:uid] = env['omniauth.auth']['uid']
   redirect to('/')
@@ -93,6 +87,14 @@ end
 
 get '/auth/failure' do
   "Authentication failed"
+end
+
+unless ENV["HOOK_SIMPLE"] == 0
+  get '/update_hook/simple' do
+    with_lock("/tmp/update_hook") do
+      "<pre>" + git_update_content + "</pre>"
+    end
+  end
 end
 
 get '/' do
