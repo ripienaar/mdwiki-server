@@ -89,10 +89,12 @@ get '/auth/failure' do
   "Authentication failed"
 end
 
-unless ENV["HOOK_SIMPLE"] == 0
-  get '/update_hook/simple' do
-    with_lock("/tmp/update_hook") do
-      "<pre>" + git_update_content + "</pre>"
+if ENV["HOOKS"] == "1"
+  unless ENV["HOOK_SIMPLE"] == "0"
+    get '/update_hook/simple' do
+      with_lock("/tmp/update_hook") do
+        "<pre>" + git_update_content + "</pre>"
+      end
     end
   end
 end
