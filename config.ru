@@ -2,6 +2,7 @@
 
 require 'sinatra'
 require 'omniauth-auth0'
+require 'filelock'
 
 configure do
   if ENV["WIKI_ROOT"]
@@ -32,34 +33,8 @@ configure do
 end
 
 helpers do
-  def unlock(lockfile)
-    File.unlink(lockfile)
-  end
-
-  def lock(lockfile)
-    if File.exist?(lockfile)
-      locking_pid = File.readlines(lockfile).first.chomp
-
-      if File.directory?("/proc/%s" % locking_pid)
-        raise("Another checkout is running with pid %s. Remove %s if no other copy is running" % [locking_pid, lockfile])
-      else
-        unlock(lockfile)
-      end
-    end
-
-    File.open(lockfile, "w") {|f| f.puts $$}
-
-    true
-  end
-
-  def with_lock(lockfile)
-    lock_owner = lock(lockfile)
-
-    yield
-  rescue
-    raise
-  ensure
-    unlock(lockfile) if lock_owner
+  def root_file
+    ENV["ROOT_FILE"] || "mdwiki.html"
   end
 
   def current_user
@@ -67,15 +42,17 @@ helpers do
   end
 
   def git_update_content
-    Dir.chdir(settings.public_folder) do
-      `git pull origin master 2>&1`
+    Filelock("/tmp/update_hook") do
+      Dir.chdir(settings.public_folder) do
+        `git pull origin master 2>&1`
+      end
     end
   end
 end
 
 before do
   pass if request.path_info =~ /^\/auth\//
-  pass if request.path_info =~ /^\/update_hook\/$/
+  pass if request.path_info =~ /^\/hooks\/$/
 
   redirect to('/auth/auth0') unless current_user
 end
@@ -91,8 +68,17 @@ end
 
 if ENV["HOOKS"] == "1"
   unless ENV["HOOK_SIMPLE"] == "0"
-    get '/update_hook/simple' do
-      with_lock("/tmp/update_hook") do
+    get '/hooks/simple' do
+      "<pre>" + git_update_content + "</pre>"
+    end
+  end
+
+  unless ENV["HOOK_GITHUB"] == "0"
+    post '/hooks/github' do
+      hook_params = JSON.parse(params[:payload])
+
+      if hook_params["ref"] == "refs/heads/master"
+        puts("Received github hook for ref %s on repository" % [hook_params["ref"], hook_params["repository"]["full_name"]])
         "<pre>" + git_update_content + "</pre>"
       end
     end
@@ -100,7 +86,7 @@ if ENV["HOOKS"] == "1"
 end
 
 get '/' do
-  File.read("mdwiki.html")
+  File.read(root_file)
 end
 
 run Sinatra::Application

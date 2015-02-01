@@ -3,7 +3,9 @@ GEM
   specs:
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
+    filelock (1.0.3)
     hashie (3.3.2)
+    json (1.8.2)
     jwt (1.2.1)
     kgio (2.9.3)
     multi_json (1.10.1)
@@ -43,6 +45,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  filelock
+  json
   omniauth-auth0
   rack (= 1.5.2)
   sinatra (~> 1.4)

@@ -6,6 +6,7 @@ You probably don't want to even think of using this yet.
 
 |Variable|Description|
 |--------|-----------|
+|ROOT_FILE|The file to be read for requests to /, defaults to ```mdwiki.html```|
 |WIKI_ROOT|Directory on disk where the wiki markdowns live, defaults to ```wiki``` in the dir where ```config.ru``` is|
 |LOCAL_DEV|Set during development preview, disables authentication|
 |SESSION_SECRET|Rack session secret, long random string, do not change once chosen|
