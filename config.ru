@@ -27,7 +27,7 @@ configure do
                ENV["AUTH0_CLIENT_ID"],
                ENV["AUTH0_CLIENT_SECRET"],
                ENV["AUTH0_DOMAIN"],
-               callback_path: "/auth/auth0/callback"
+               callback_path: ENV["AUTH0_CALLBACK"] || "/auth/auth0/callback"
     end
   end
 end
@@ -52,7 +52,7 @@ end
 
 before do
   pass if request.path_info =~ /^\/auth\//
-  pass if request.path_info =~ /^\/hooks\/$/
+  pass if request.path_info =~ /^\/hooks\//
 
   redirect to('/auth/auth0') unless current_user
 end
