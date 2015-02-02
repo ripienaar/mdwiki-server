@@ -75,10 +75,32 @@ if ENV["HOOKS"] == "1"
 
   unless ENV["HOOK_GITHUB"] == "0"
     post '/hooks/github' do
-      hook_params = JSON.parse(params[:payload])
+      hook_params = JSON.parse(request.body.read)
 
       if hook_params["ref"] == "refs/heads/master"
-        puts("Received github hook for ref %s on repository" % [hook_params["ref"], hook_params["repository"]["full_name"]])
+        puts("Received github hook for ref %s on repository %s" % [hook_params["ref"], hook_params["repository"]["full_name"]])
+        "<pre>" + git_update_content + "</pre>"
+      end
+    end
+  end
+
+  unless ENV["HOOK_BITBUCKET"] == "0"
+    post '/hooks/bitbucket' do
+      hook_params = JSON.parse(request.body.read)
+
+      if hook_params["ref"] == "refs/heads/master"
+        puts("Received bitbucket hook for ref %s on repository %s" % [hook_params["commits"]["node"], hook_params["repository"]["absolute_url"]])
+        "<pre>" + git_update_content + "</pre>"
+      end
+    end
+  end
+
+  unless ENV["HOOK_GOGS"] == "0"
+    post '/hooks/gogs' do
+      hook_params = JSON.parse(request.body.read)
+
+      if hook_params["ref"] == "refs/heads/master"
+        puts("Received bitbucket hook for ref %s on repository %s" % [hook_params["ref"], hook_params["repository"]["url"]])
         "<pre>" + git_update_content + "</pre>"
       end
     end

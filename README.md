@@ -17,3 +17,4 @@ You probably don't want to even think of using this yet.
 |HOOK_SIMPLE|Set to 0 to disable the simple hook that will try to git update the ```WIKI_ROOT```|
 |HOOK_GITHUB|Set to 0 to disable the GitHub hook that will try to git update the ```WIKI_ROOT```|
 |HOOK_BITBUCKET|Set to 0 to disable the Bit Bucket hook that will try to git update the ```WIKI_ROOT```|
+|HOOK_GOGS|Set to 0 to disable the Gogs hook that will try to git update the ```WIKI_ROOT```|
