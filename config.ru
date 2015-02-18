@@ -100,7 +100,7 @@ if ENV["HOOKS"] == "1"
       hook_params = JSON.parse(request.body.read)
 
       if hook_params["ref"] == "refs/heads/master"
-        puts("Received bitbucket hook for ref %s on repository %s" % [hook_params["ref"], hook_params["repository"]["url"]])
+        puts("Received gogs hook for ref %s on repository %s" % [hook_params["ref"], hook_params["repository"]["url"]])
         "<pre>" + git_update_content + "</pre>"
       end
     end
