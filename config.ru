@@ -52,7 +52,7 @@ end
 
 before do
   pass if request.path_info =~ /^\/auth\//
-  pass if request.path_info =~ /^\/hooks\/$/
+  pass if request.path_info =~ /^\/hooks\//
 
   redirect to('/auth/auth0') unless current_user
 end
