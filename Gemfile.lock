@@ -20,7 +20,7 @@ GEM
     omniauth (1.2.2)
       hashie (>= 1.2, < 4)
       rack (~> 1.0)
-    omniauth-clef (1.0.2)
+    omniauth-auth0 (1.3.0)
       omniauth-oauth2 (~> 1.1)
     omniauth-oauth2 (1.2.0)
       faraday (>= 0.8, < 0.10)
@@ -47,7 +47,7 @@ PLATFORMS
 DEPENDENCIES
   filelock
   json
-  omniauth-clef
+  omniauth-auth0
   rack (= 1.5.2)
   sinatra (~> 1.4)
   unicorn

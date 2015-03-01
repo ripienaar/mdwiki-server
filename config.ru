@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 require 'sinatra'
-require 'omniauth-clef'
+require 'omniauth-auth0'
 require 'filelock'
 
 configure do
@@ -12,7 +12,7 @@ configure do
   end
 
   unless ENV["LOCAL_DEV"] == "1"
-    ["SESSION_SECRET", "CLEF_APP_ID", "CLEF_SECRET", "CLEF_USERS"].each do |v|
+    ["SESSION_SECRET", "AUTH0_CLIENT_ID", "AUTH0_CLIENT_SECRET", "AUTH0_DOMAIN"].each do |v|
       next if ENV.include?(v)
 
       raise("%s needs to be set in the environment for this app to function" % v)
@@ -23,7 +23,11 @@ configure do
                                :secret => ENV["SESSION_SECRET"]
 
     use OmniAuth::Builder do
-      provider :clef, ENV['CLEF_APP_ID'], ENV['CLEF_SECRET']
+      provider :auth0,
+               ENV["AUTH0_CLIENT_ID"],
+               ENV["AUTH0_CLIENT_SECRET"],
+               ENV["AUTH0_DOMAIN"],
+               callback_path: "/auth/auth0/callback"
     end
   end
 end
@@ -31,13 +35,6 @@ end
 helpers do
   def root_file
     ENV["ROOT_FILE"] || "mdwiki.html"
-  end
-
-  def valid_user?(user)
-    users = ENV["CLEF_USERS"].split(",")
-    return true if users.include?("*")
-    return true if users.include?(user.to_s)
-    return false
   end
 
   def current_user
@@ -57,18 +54,16 @@ before do
   pass if request.path_info =~ /^\/auth\//
   pass if request.path_info =~ /^\/hooks\//
 
-  redirect to('/auth/clef') unless current_user
+  redirect to('/auth/auth0') unless current_user
 end
 
-get '/auth/clef/callback' do
-  redirect("/auth/failure?uid=%s" % env['omniauth.auth']['uid']) unless valid_user?(env['omniauth.auth']['uid'])
-
+get '/auth/auth0/callback' do
   session[:uid] = env['omniauth.auth']['uid']
   redirect to('/')
 end
 
 get '/auth/failure' do
-  "Authentication failed for user id %s" % params["uid"]
+  "Authentication failed"
 end
 
 if ENV["HOOKS"] == "1"
@@ -113,12 +108,7 @@ if ENV["HOOKS"] == "1"
 end
 
 get '/' do
-  send_file(root_file)
-end
-
-get '/logout' do
-  session[:uid] = nil
-  "Logged out"
+  File.read(root_file)
 end
 
 run Sinatra::Application
