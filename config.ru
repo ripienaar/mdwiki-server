@@ -108,7 +108,12 @@ if ENV["HOOKS"] == "1"
 end
 
 get '/' do
-  File.read(root_file)
+  send_file(root_file)
+end
+
+get '/logout' do
+  session[:uid] = nil
+  "Logged out"
 end
 
 run Sinatra::Application
