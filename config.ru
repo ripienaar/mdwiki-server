@@ -16,7 +16,7 @@ configure do
 
   use_static_index 'index.html'
 
-  unless ENV["LOCAL_DEV"] == "1"
+  unless ENV["LOCAL_DEV"] == "1" || ENV["NO_AUTH"] == "1"
     ["SESSION_SECRET", "AUTH0_CLIENT_ID", "AUTH0_CLIENT_SECRET", "AUTH0_DOMAIN"].each do |v|
       next if ENV.include?(v)
 
@@ -50,6 +50,7 @@ helpers do
     Filelock("/tmp/update_hook") do
       Dir.chdir(settings.public_folder) do
         `git pull origin master 2>&1`
+
         if File.exist?("post-hook.sh") && File.executable?("post-hook.sh")
           `./post-hook.sh`
         end
