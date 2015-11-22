@@ -3,6 +3,7 @@
 require 'sinatra'
 require 'filelock'
 require 'sinatra-index'
+require 'json'
 
 register Sinatra::Index
 
