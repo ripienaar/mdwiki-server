@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
 require 'sinatra'
-require 'omniauth-auth0'
 require 'filelock'
 require 'sinatra-index'
 
@@ -15,35 +14,11 @@ configure do
   end
 
   use_static_index 'index.html'
-
-  unless ENV["LOCAL_DEV"] == "1" || ENV["NO_AUTH"] == "1"
-    ["SESSION_SECRET", "AUTH0_CLIENT_ID", "AUTH0_CLIENT_SECRET", "AUTH0_DOMAIN"].each do |v|
-      next if ENV.include?(v)
-
-      raise("%s needs to be set in the environment for this app to function" % v)
-    end
-
-    use Rack::Session::Cookie, :key => 'rack.session',
-                               :expire_after => 86400,
-                               :secret => ENV["SESSION_SECRET"]
-
-    use OmniAuth::Builder do
-      provider :auth0,
-               ENV["AUTH0_CLIENT_ID"],
-               ENV["AUTH0_CLIENT_SECRET"],
-               ENV["AUTH0_DOMAIN"],
-               callback_path: "/auth/auth0/callback"
-    end
-  end
 end
 
 helpers do
   def root_file
     ENV["ROOT_FILE"] || "mdwiki.html"
-  end
-
-  def current_user
-    ENV["LOCAL_DEV"] == "1" || !session[:uid].nil?
   end
 
   def git_update_content
@@ -57,22 +32,6 @@ helpers do
       end
     end
   end
-end
-
-before do
-  pass if request.path_info =~ /^\/auth\//
-  pass if request.path_info =~ /^\/hooks\//
-
-  redirect to('/auth/auth0') unless current_user
-end
-
-get '/auth/auth0/callback' do
-  session[:uid] = env['omniauth.auth']['uid']
-  redirect to('/')
-end
-
-get '/auth/failure' do
-  "Authentication failed"
 end
 
 if ENV["HOOKS"] == "1"
@@ -118,11 +77,6 @@ end
 
 get '/' do
   send_file(root_file)
-end
-
-get '/logout' do
-  session[:uid] = nil
-  "Logged out"
 end
 
 run Sinatra::Application
