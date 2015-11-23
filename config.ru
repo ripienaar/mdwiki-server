@@ -24,7 +24,7 @@ helpers do
 
   def git_update_content
     Filelock("/tmp/update_hook") do
-      Dir.chdir(settings.public_folder) do
+      Dir.chdir(ENV["WIKI_REPO"] || settings.public_folder) do
         `git pull origin master 2>&1`
 
         if File.exist?("post-hook.sh") && File.executable?("post-hook.sh")
