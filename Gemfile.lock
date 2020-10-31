@@ -26,7 +26,7 @@ GEM
     omniauth-oauth2 (1.5.0)
       oauth2 (~> 1.1)
       omniauth (~> 1.2)
-    rack (1.5.2)
+    rack (1.6.13)
     rack-protection (1.5.5)
       rack
     raindrops (0.19.1)
@@ -49,7 +49,7 @@ DEPENDENCIES
   filelock
   json
   omniauth-auth0
-  rack (= 1.5.2)
+  rack (= 1.6.13)
   sinatra (~> 1.4)
   sinatra-index
   unicorn
