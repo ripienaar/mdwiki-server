@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
-gem 'rack', '1.5.2'
-gem 'sinatra', '~> 1.4'
+gem 'rack', '2.2.4'
+gem 'sinatra', '~> 3.0'
 gem 'sinatra-index'
 gem 'omniauth-auth0'
 gem 'unicorn'
